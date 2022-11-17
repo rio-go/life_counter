@@ -85,6 +85,14 @@ class _LifeCounterPageState extends State<LifeCounterPage> {
                 ),
                 IconButton(
                   onPressed: () {
+                    lifeEvent.count--;
+                    lifeEventBox?.put(lifeEvent);
+                    fetchLifeEvents();
+                  },
+                  icon: const Icon(Icons.remove),
+                ),
+                IconButton(
+                  onPressed: () {
                     lifeEventBox?.remove(lifeEvent.id);
                     fetchLifeEvents();
                   },
@@ -95,21 +103,43 @@ class _LifeCounterPageState extends State<LifeCounterPage> {
           );
         },
       ),
-      floatingActionButton: FloatingActionButton(
-        child: const Icon(Icons.add),
-        onPressed: () async {
-          final newLifeEvent = await Navigator.of(context).push<LifeEvent>(
-            MaterialPageRoute(
-              builder: (context) {
-                return const AddLifeEventPage();
+      floatingActionButton: Column(
+        verticalDirection: VerticalDirection.up,
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          Padding(
+            padding: const EdgeInsets.only(bottom: 16.0),
+            child: FloatingActionButton(
+              backgroundColor: Colors.blue,
+              child: const Icon(Icons.add),
+              onPressed: () async {
+                final newLifeEvent =
+                    await Navigator.of(context).push<LifeEvent>(
+                  MaterialPageRoute(
+                    builder: (context) {
+                      return const AddLifeEventPage();
+                    },
+                  ),
+                );
+                if (newLifeEvent != null) {
+                  lifeEventBox?.put(newLifeEvent);
+                  fetchLifeEvents();
+                }
               },
             ),
-          );
-          if (newLifeEvent != null) {
-            lifeEventBox?.put(newLifeEvent);
-            fetchLifeEvents();
-          }
-        },
+          ),
+          Padding(
+            padding: const EdgeInsets.only(bottom: 16.0),
+            child: FloatingActionButton(
+              backgroundColor: Colors.red,
+              child: const Icon(Icons.delete),
+              onPressed: () {
+                lifeEventBox?.removeAll();
+                fetchLifeEvents();
+              },
+            ),
+          ),
+        ],
       ),
     );
   }
